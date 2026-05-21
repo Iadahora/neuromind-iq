@@ -350,6 +350,7 @@ h1 .grad{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 40%,v
 .iq-ring-scene svg{position:absolute;inset:0;width:100%;height:100%;}
 .iq-ring-inner{position:absolute;inset:14px;background:var(--bg);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--border);}
 .iq-num{font-family:'Syne',sans-serif;font-size:64px;font-weight:800;letter-spacing:-4px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+@keyframes iqPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.08);}}
 .iq-tag{font-size:11px;color:var(--muted);letter-spacing:2px;font-weight:600;}
 
 /* Cognitive avatar reveal */
@@ -915,9 +916,16 @@ h1 .grad{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 40%,v
             transform="rotate(-90 110 110)" id="iq-circle" style="transition:stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1)"/>
         </svg>
         <div class="iq-ring-inner">
-          <div class="iq-num" id="iq-num">0</div>
-          <div class="iq-tag">QI</div>
+          <div class="iq-num" id="iq-num" style="font-size:52px;letter-spacing:-2px;">?</div>
+          <div class="iq-tag">SEU QI</div>
         </div>
+      </div>
+
+      <!-- QI locked message -->
+      <div style="background:linear-gradient(135deg,rgba(124,111,255,.15),rgba(0,212,255,.08));border:1px solid rgba(124,111,255,.35);border-radius:18px;padding:20px 24px;max-width:400px;margin:0 auto 24px;text-align:center;">
+        <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:6px;">Seu QI foi calculado!</div>
+        <div style="font-size:14px;color:var(--muted2);line-height:1.6;">Desbloqueie o relatório completo para revelar seu número exato de QI e análise completa.</div>
       </div>
 
       <!-- Cognitive avatar reveal -->
@@ -934,18 +942,18 @@ h1 .grad{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 40%,v
       <div class="result-iq-sub" id="res-sub">Top 10% da população global</div>
     </div>
 
-    <!-- Percentile -->
+    <!-- Percentile — vague, no exact number -->
     <div class="perc-section">
       <div class="perc-comparison" id="perc-text">Você pensa mais rápido que <em>9 em cada 10 pessoas</em></div>
       <div class="perc-head">
         <span>Percentil 0</span>
-        <span id="perc-pct-label" style="color:var(--accent2);font-weight:600;">87° percentil</span>
+        <span id="perc-pct-label" style="color:var(--accent2);font-weight:600;">Acima da média</span>
         <span>Percentil 100</span>
       </div>
       <div class="perc-bar"><div class="perc-fill" id="perc-fill"></div></div>
     </div>
 
-    <!-- Preview bars -->
+    <!-- Preview bars — sem pontuação numérica -->
     <div class="bars-section">
       <div class="bars-title">📊 Prévia do Perfil Cognitivo <span class="bars-badge">3 de 8 dimensões</span></div>
       <div id="preview-bars"></div>
@@ -1456,23 +1464,19 @@ function revealResult(){
   const rw=document.getElementById('result-wrap');
   rw.style.display='flex';
 
-  // Animate IQ number
+  // IQ number — mantém oculto com "?" pulsando
   const el=document.getElementById('iq-num');
-  const t=S.iq, dur=1600, st=Date.now();
-  const anim=setInterval(()=>{
-    const p=Math.min((Date.now()-st)/dur,1);
-    el.textContent=Math.round((1-Math.pow(1-p,3))*t);
-    if(p>=1) clearInterval(anim);
-  },16);
+  el.textContent='?';
+  el.style.fontSize='52px';
+  el.style.animation='iqPulse 2s ease-in-out infinite';
 
-  // SVG circle
+  // SVG circle — mostra arco parcial misterioso (70% fixo para criar curiosidade)
   setTimeout(()=>{
     const c=document.getElementById('iq-circle');
-    const pct=(S.iq-82)/66;
-    c.style.strokeDashoffset=603-(603*pct);
+    c.style.strokeDashoffset=603-(603*0.72); // arco fixo, não revela o QI real
   },100);
 
-  // Profile
+  // Profile — mostra perfil mas não o número
   const prof=S.profile;
   document.getElementById('cog-emoji').textContent=prof.emoji;
   document.getElementById('cog-name').textContent=prof.name;
@@ -1480,18 +1484,18 @@ function revealResult(){
   document.getElementById('res-title').textContent=prof.title;
   document.getElementById('res-sub').textContent=prof.sub;
 
-  // Percentile text — human-friendly version
+  // Percentile — vago, sem número exato
   const p=S.pct;
   let percText;
-  if(p>=95) percText=`Você pensa mais rápido que <em>19 em cada 20 pessoas</em>`;
-  else if(p>=90) percText=`Você está acima de <em>9 em cada 10 pessoas</em>`;
-  else if(p>=80) percText=`Você superou <em>${p}% da população global</em>`;
-  else percText=`Você está acima de <em>${p}% das pessoas</em>`;
+  if(p>=90) percText=`Você pensa mais rápido que <em>9 em cada 10 pessoas</em>`;
+  else if(p>=75) percText=`Você superou <em>a grande maioria</em> dos participantes`;
+  else if(p>=50) percText=`Você está <em>acima da média</em> da população`;
+  else percText=`Você está <em>dentro da faixa normal</em> da população`;
   document.getElementById('perc-text').innerHTML=percText;
-  document.getElementById('perc-pct-label').textContent=`${p}° percentil`;
+  document.getElementById('perc-pct-label').textContent='Desbloqueie para ver';
   setTimeout(()=>{ document.getElementById('perc-fill').style.width=p+'%'; },300);
 
-  // Preview bars (3 of 8)
+  // Preview bars — sem pontuação numérica, só barras visuais
   const ratio=S.score/QS.reduce((s,q)=>s+q.pts,0);
   const prevBars=[
     {name:"Raciocínio Lógico",score:Math.round(58+ratio*38),color:"linear-gradient(90deg,#7c6fff,#5b4fff)"},
@@ -1500,7 +1504,10 @@ function revealResult(){
   ];
   document.getElementById('preview-bars').innerHTML=prevBars.map(b=>`
     <div class="bar-row">
-      <div class="bar-meta"><span class="bar-name">${b.name}</span><span class="bar-score">${b.score}/100</span></div>
+      <div class="bar-meta">
+        <span class="bar-name">${b.name}</span>
+        <span class="bar-score" style="filter:blur(5px);user-select:none;">██</span>
+      </div>
       <div class="bar-track"><div class="bar-fill" style="background:${b.color}" data-w="${b.score}"></div></div>
     </div>`).join('');
   setTimeout(()=>document.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'),400);
