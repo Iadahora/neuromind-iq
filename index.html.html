@@ -326,9 +326,7 @@ footer a{color:#718096;text-decoration:none;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-  window.addEventListener('DOMContentLoaded', function() {
-    emailjs.init("pdf552kvp8kAmGuSk");
-  });
+  emailjs.init("pdf552kvp8kAmGuSk");
 </script>
 </head>
 <body>
@@ -525,6 +523,7 @@ footer a{color:#718096;text-decoration:none;}
         <div class="email-stat"><div class="email-stat-label">Mais rápido que</div><div class="email-stat-val" id="email-speed">--%</div></div>
         <div class="email-stat"><div class="email-stat-label">Habilidade forte</div><div class="email-stat-val" id="email-skill">Lógica</div></div>
       </div>
+      <input class="email-input" type="text" id="name-input" placeholder="Seu nome completo" style="margin-bottom:11px;" oninput="checkEmail()"/>
       <input class="email-input" type="email" id="email-input" placeholder="seu@email.com" oninput="checkEmail()"/>
       <button class="email-btn" id="email-btn" onclick="goToResult()">Continuar →</button>
       <div class="email-privacy">O NeuroMind IQ garante a confidencialidade de suas informações. Ao clicar em "Continuar" você aceita os <a href="#" style="color:var(--accent);">Termos</a> e <a href="#" style="color:var(--accent);">Privacidade</a>.</div>
@@ -691,8 +690,8 @@ footer a{color:#718096;text-decoration:none;}
       </div>
       <div class="lock-overlay2">
         <div class="lock-icon2">🔒</div><div class="lock-h2">Desbloquear Relatório Completo</div>
-        <p class="lock-p2">QI exato, análise por IA, ranking mundial, certificado PDF e 8 dimensões — por apenas .</p>
-        <button class="unlock-btn2" onclick="goCheckout()">🔓 Desbloquear por  →</button>
+        <p class="lock-p2">QI exato, análise por IA, ranking mundial, certificado PDF e 8 dimensões — por apenas R$9,99.</p>
+        <button class="unlock-btn2" onclick="goCheckout()">🔓 Desbloquear por R$9,99 →</button>
         <div style="font-size:12px;color:var(--muted);margin-top:7px;">⚡ Pix disponível · Resultado imediato</div>
       </div>
     </div>
@@ -738,8 +737,14 @@ footer a{color:#718096;text-decoration:none;}
 <div id="success-screen" class="screen">
   <div class="success-wrap2">
     <div class="success-check2">✓</div>
-    <div class="success-title2">Acesso Desbloqueado! 🎉</div>
+    <div class="success-title2" id="s-greeting">Acesso Desbloqueado! 🎉</div>
     <div class="success-sub2">Aqui está seu relatório cognitivo completo</div>
+
+    <!-- Avatar personalizado com iniciais -->
+    <div id="user-avatar-wrap" style="margin:0 auto 20px;position:relative;width:90px;height:90px;">
+      <canvas id="avatar-canvas" width="90" height="90" style="border-radius:50%;box-shadow:0 4px 16px rgba(26,107,90,.25);"></canvas>
+    </div>
+
     <div class="full-report-card2">
       <div class="report-iq-row2"><div class="report-iq-big2" id="s-iq">127</div><div><div class="report-iq-cat2" id="s-cat">Inteligência Superior</div><div class="report-iq-sub2" id="s-sub">Top 13% mundial</div></div></div>
       <div class="profile-reveal"><span class="profile-reveal-emoji" id="s-emoji">🔬</span><div><div class="pr-label">Perfil Cognitivo</div><div class="pr-name" id="s-profile-name">Analítico</div><div class="pr-desc" id="s-profile-desc">Raciocínio lógico excepcional.</div></div></div>
@@ -765,7 +770,7 @@ footer a{color:#718096;text-decoration:none;}
 <script>
 const KIWIFY_URL='https://pay.kiwify.com.br/3fR2rN8';
 const SITE_URL='https://neuromindiq.com.br';
-const S={q:0,score:0,answers:new Array(40).fill(null),iq:0,pct:0,profile:null,timeLeft:900,timerInt:null,urgencyLeft:587,urgencyInt:null,gender:'M',edu:'',email:'',startTime:0,popupsShown:[],pendingAnswer:null};
+const S={q:0,score:0,answers:new Array(40).fill(null),iq:0,pct:0,profile:null,timeLeft:900,timerInt:null,urgencyLeft:587,urgencyInt:null,gender:'M',edu:'',email:'',name:'',startTime:0,popupsShown:[],pendingAnswer:null};
 const PROFILES=[
   {min:130,emoji:'🧙‍♂️',name:'Visionário Excepcional',desc:'Capacidade cognitiva extraordinária. Pensamento sistêmico e visão global.',title:'Inteligência Excepcional',sub:'Top 2% da população mundial'},
   {min:120,emoji:'🔬',name:'Analítico Superior',desc:'Raciocínio lógico e precisão excepcionais. Resolve problemas complexos com facilidade.',title:'Inteligência Superior',sub:'Top 10% da população'},
@@ -933,16 +938,27 @@ function showEmailScreen(){
   document.getElementById('email-skill').textContent=topSkill;
   showScreen('email-screen');
 }
-function checkEmail(){const v=document.getElementById('email-input').value;const valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);const btn=document.getElementById('email-btn');btn.style.opacity=valid?'1':'0.5';btn.style.pointerEvents=valid?'auto':'none';btn.className=valid?'email-btn ready':'email-btn';}
+function checkEmail(){
+  const emailVal=document.getElementById('email-input').value;
+  const nameVal=document.getElementById('name-input')?document.getElementById('name-input').value.trim():'';
+  const validEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+  const validName=nameVal.length>=2;
+  const valid=validEmail&&validName;
+  const btn=document.getElementById('email-btn');
+  btn.style.opacity=valid?'1':'0.5';
+  btn.style.pointerEvents=valid?'auto':'none';
+  btn.className=valid?'email-btn ready':'email-btn';
+}
 function goToResult(){
   S.email=document.getElementById('email-input').value||'';
+  S.name=document.getElementById('name-input')?document.getElementById('name-input').value.trim():'';
   const maxPts=QS.reduce((acc,q)=>acc+q.pts,0);const ratio=S.score/maxPts;
   S.iq=Math.round(82+ratio*63+Math.random()*4);S.iq=Math.min(148,Math.max(82,S.iq));
   S.pct=Math.round(25+ratio*70);S.pct=Math.min(99,Math.max(18,S.pct));
   S.profile=getProfile(S.iq);
   try{localStorage.setItem('nm_iq',S.iq);localStorage.setItem('nm_score',S.score);}catch(e){}
   // Envia email automático com resultado
-  if(S.email) sendResultEmail(S.email, S.profile.name);
+  if(S.email) sendResultEmail(S.email, S.profile.name, S.name);
   showScreen('result-screen');runProcessing();
 }
 function runProcessing(){
@@ -980,10 +996,73 @@ function revealResult(){
 function goCheckout(){showScreen('checkout-screen');startUrgencyTimer();}
 function startUrgencyTimer(){clearInterval(S.urgencyInt);S.urgencyLeft=587;S.urgencyInt=setInterval(()=>{S.urgencyLeft--;const m=Math.floor(S.urgencyLeft/60),s=S.urgencyLeft%60;const e=document.getElementById('urgency-timer');if(e)e.textContent=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;if(S.urgencyLeft<=0)clearInterval(S.urgencyInt);},1000);}
 function processPayment(){const btn=document.querySelector('.checkout-cta-btn2');btn.textContent='⌛ Redirecionando...';btn.disabled=true;btn.style.opacity='.7';setTimeout(()=>{if(KIWIFY_URL&&!KIWIFY_URL.includes('SEU_LINK')){window.location.href=KIWIFY_URL;}else showSuccessScreen();},800);}
-function checkPaymentReturn(){const p=new URLSearchParams(window.location.search);if(p.get('status')==='approved'||p.get('paid')==='true'){try{const si=localStorage.getItem('nm_iq');const ss=localStorage.getItem('nm_score');if(si){S.iq=parseInt(si);S.score=parseInt(ss)||80;}else{S.iq=115;S.score=80;}}catch(e){S.iq=115;S.score=80;}S.profile=getProfile(S.iq);showSuccessScreen();}}
+function checkPaymentReturn(){
+  const p=new URLSearchParams(window.location.search);
+  // Retorno após pagamento aprovado
+  if(p.get('status')==='approved'||p.get('paid')==='true'){
+    try{const si=localStorage.getItem('nm_iq');const ss=localStorage.getItem('nm_score');
+    if(si){S.iq=parseInt(si);S.score=parseInt(ss)||80;}else{S.iq=115;S.score=80;}}
+    catch(e){S.iq=115;S.score=80;}
+    S.profile=getProfile(S.iq);showSuccessScreen();return;
+  }
+  // Retorno do link do email — vai para checkout, não para resultado
+  if(p.get('action')==='checkout'){
+    try{const si=localStorage.getItem('nm_iq');const ss=localStorage.getItem('nm_score');
+    if(si){S.iq=parseInt(si);S.score=parseInt(ss)||80;}else{S.iq=115;S.score=80;}}
+    catch(e){S.iq=115;S.score=80;}
+    S.profile=getProfile(S.iq);
+    showScreen('result-screen');
+    // Show result first, then auto-open checkout after brief delay
+    document.getElementById('proc-wrap').style.display='none';
+    const rw=document.getElementById('result-wrap');rw.style.display='flex';
+    revealResult();
+    setTimeout(()=>goCheckout(), 1500);
+  }
+}
 function showSuccessScreen(){
   showScreen('success-screen');
   const prof=S.profile||getProfile(S.iq||115);
+  // Personalized greeting
+  const firstName = S.name ? S.name.split(' ')[0] : '';
+  document.getElementById('s-greeting').textContent = firstName
+    ? `Parabéns, ${firstName}! 🎉`
+    : 'Acesso Desbloqueado! 🎉';
+
+  // Draw avatar with initials
+  setTimeout(()=>{
+    const canvas = document.getElementById('avatar-canvas');
+    if(canvas){
+      const ctx = canvas.getContext('2d');
+      const name = S.name || S.email || 'U';
+      const parts = name.trim().split(' ');
+      const initials = parts.length >= 2
+        ? (parts[0][0] + parts[parts.length-1][0]).toUpperCase()
+        : name.substring(0,2).toUpperCase();
+
+      // Background gradient
+      const grad = ctx.createLinearGradient(0,0,90,90);
+      grad.addColorStop(0,'#1a6b5a');
+      grad.addColorStop(1,'#1e6fbf');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(45,45,45,0,Math.PI*2);
+      ctx.fill();
+
+      // Inner circle
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      ctx.beginPath();
+      ctx.arc(45,45,36,0,Math.PI*2);
+      ctx.fill();
+
+      // Initials text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 32px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(initials, 45, 46);
+    }
+  }, 100);
+
   document.getElementById('s-iq').textContent=S.iq||115;
   document.getElementById('s-cat').textContent=prof.title;
   document.getElementById('s-sub').textContent=prof.sub;
@@ -1009,6 +1088,11 @@ function generateShareImage(paid){
   ctx.fillStyle='#ffffff';rr(ctx,20,20,560,275,14);ctx.fill();
   ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1.5;rr(ctx,20,20,560,275,14);ctx.stroke();
   ctx.fillStyle='#1a6b5a';ctx.font='bold 13px sans-serif';ctx.fillText('NEUROMIND IQ',40,54);
+  // Show person name on share image
+  if(S.name){
+    ctx.fillStyle='#1a202c';ctx.font='bold 15px sans-serif';
+    ctx.fillText(S.name.split(' ').slice(0,2).join(' '),40,76);
+  }
   ctx.font='58px sans-serif';ctx.fillText(prof.emoji,40,152);
   ctx.fillStyle='#1a202c';ctx.font='bold 24px sans-serif';ctx.fillText(prof.name,118,108);
   ctx.fillStyle='#4a5568';ctx.font='14px sans-serif';ctx.fillText(prof.title,118,130);
@@ -1047,20 +1131,28 @@ function shareResult(platform,paid){
 function confetti(){const colors=['#1a6b5a','#1e6fbf','#d69e2e','#9f7aea','#38a169'];for(let i=0;i<60;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-p';p.style.cssText=`left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;animation-duration:${2+Math.random()*3}s;border-radius:${Math.random()>.5?'50%':'2px'};`;document.body.appendChild(p);setTimeout(()=>p.remove(),5000);},i*25);}}
 
 // ── EMAILJS — Envio automático de resultado ──
-function sendResultEmail(email, profileName) {
+function sendResultEmail(email, profileName, userName) {
   if (!email || !email.includes('@')) return;
-  const resultUrl = 'https://neuromindiq.com.br/?status=approved';
-  emailjs.send('servico_fa9q4zj', 'template_ulo9d9d', {
+  const resultUrl = 'https://neuromindiq.com.br/?action=checkout';
+  // Envia todas as variáveis possíveis para compatibilidade com o template
+  const params = {
     email: email,
-    name: email.split('@')[0],
+    to_email: email,
+    name: userName || email.split('@')[0],
+    user_name: userName || email.split('@')[0],
+    title: 'Avaliação de QI NeuroMind',
     profile_name: profileName,
     result_url: resultUrl,
-    to_email: email,
-  }).then(function() {
-    console.log('Email enviado com sucesso!');
-  }, function(error) {
-    console.log('Erro ao enviar email:', error);
-  });
+    from_name: 'NeuroMind IQ',
+    reply_to: email,
+  };
+  console.log('Enviando email para:', email, 'params:', params);
+  emailjs.send('servico_fa9q4zj', 'template_ulo9d9d', params)
+    .then(function(response) {
+      console.log('Email enviado! Status:', response.status, response.text);
+    }, function(error) {
+      console.error('Erro EmailJS:', JSON.stringify(error));
+    });
 }
 
 window.addEventListener('DOMContentLoaded',()=>{animateLive();checkPaymentReturn();});
