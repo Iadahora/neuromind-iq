@@ -323,11 +323,26 @@ footer a{color:#718096;text-decoration:none;}
   .iq-comp-bar{width:58px;}
   .share-btns2{grid-template-columns:1fr;}
 }
+
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+@keyframes toastOut{to{opacity:0;transform:translateX(-50%) translateY(20px);}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
   emailjs.init("pdf552kvp8kAmGuSk");
 </script>
+<!-- Open Graph / Social Sharing -->
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://neuromindiq.com.br/"/>
+<meta property="og:title" content="NeuroMind IQ — Descubra Sua Pontuação de QI"/>
+<meta property="og:description" content="Mais de 1.2 milhão de pessoas já descobriram seu potencial cognitivo. Faça o teste grátis e veja seu perfil na hora!"/>
+<meta property="og:image" content="https://neuromindiq.com.br/og-image.jpg"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="NeuroMind IQ — Descubra Sua Pontuação de QI"/>
+<meta name="twitter:description" content="Mais de 1.2 milhão de pessoas já descobriram seu potencial cognitivo. Faça o teste grátis!"/>
+<meta name="twitter:image" content="https://neuromindiq.com.br/og-image.jpg"/>
 </head>
 <body>
 <!-- LANDING -->
@@ -753,12 +768,15 @@ footer a{color:#718096;text-decoration:none;}
     <div class="share-complete">
       <div class="share-complete-title">Compartilhe seu resultado! 🎉</div>
       <div class="share-complete-sub">Mostre ao mundo seu QI e desafie seus amigos</div>
+      <div style="background:#fffbeb;border:1px solid #f6d860;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#744210;max-width:460px;margin-left:auto;margin-right:auto;">
+        💡 <strong>Dica:</strong> Ao clicar nos botões abaixo, a imagem é baixada automaticamente. Anexe ela ao seu post para muito mais impacto!
+      </div>
       <canvas id="share-preview" width="600" height="315" class="share-canvas-preview"></canvas>
       <div class="share-btns2">
-        <button class="share-btn2" onclick="shareResult('whatsapp','paid')" style="background:#25d366;color:#fff;">💬 WhatsApp</button>
-        <button class="share-btn2" onclick="shareResult('twitter','paid')" style="background:#1d9bf0;color:#fff;">🐦 Twitter/X</button>
+        <button class="share-btn2" onclick="shareResult('whatsapp','paid')" style="background:#25d366;color:#fff;">💬 WhatsApp + 📸</button>
+        <button class="share-btn2" onclick="shareResult('twitter','paid')" style="background:#1d9bf0;color:#fff;">🐦 Twitter/X + 📸</button>
         <button class="share-btn2" onclick="shareResult('instagram','paid')" style="background:linear-gradient(135deg,#f09433,#dc2743,#bc1888);color:#fff;">📸 Instagram</button>
-        <button class="share-btn2" onclick="shareResult('facebook','paid')" style="background:#1877f2;color:#fff;">👍 Facebook</button>
+        <button class="share-btn2" onclick="shareResult('facebook','paid')" style="background:#1877f2;color:#fff;">👍 Facebook + 📸</button>
         <button class="share-btn2" onclick="shareResult('tiktok','paid')" style="background:#010101;color:#fff;">🎵 TikTok</button>
         <button class="share-btn2" onclick="shareResult('download','paid')" style="background:var(--accent);color:#fff;">⬇️ Baixar Imagem</button>
       </div>
@@ -1124,9 +1142,52 @@ function shareResult(platform,paid){
   if(platform==='download'){if(canvas){const l=document.createElement('a');l.download=`neuromind-qi-${paid==='paid'?iq:'perfil'}.png`;l.href=canvas.toDataURL('image/png');l.click();}return;}
   if(platform==='instagram'){if(canvas){const l=document.createElement('a');l.download='neuromind-iq-stories.png';l.href=canvas.toDataURL('image/png');l.click();}setTimeout(()=>alert('📸 Imagem baixada!\n\nAbra o Instagram, crie um Story e selecione a imagem baixada.'),500);return;}
   if(platform==='tiktok'){const txt=texts.tiktok[paid];navigator.clipboard.writeText(txt).then(()=>alert('✅ Texto copiado!\n\n'+txt)).catch(()=>prompt('Copie:',txt));return;}
-  if(platform==='whatsapp'){window.open(`https://wa.me/?text=${encodeURIComponent(texts.whatsapp[paid])}`,'_blank');return;}
-  if(platform==='twitter'){window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texts.twitter[paid])}`,'_blank');return;}
-  if(platform==='facebook'){window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}&quote=${encodeURIComponent(texts.facebook[paid])}`,'_blank');return;}
+  if(platform==='whatsapp'){
+    if(canvas && paid==='paid'){
+      const link=document.createElement('a');
+      link.download='meu-qi-neuromind.png';
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+      setTimeout(()=>{
+        window.open(`https://wa.me/?text=${encodeURIComponent(texts.whatsapp[paid])}`,'_blank');
+      }, 800);
+      showToast('📸 Imagem baixada! Envie junto com a mensagem no WhatsApp!');
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(texts.whatsapp[paid])}`,'_blank');
+    }
+    return;
+  }
+  if(platform==='twitter'){
+    // Download image first for user to attach, then open Twitter
+    if(canvas && paid==='paid'){
+      const link=document.createElement('a');
+      link.download='meu-qi-neuromind.png';
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+      setTimeout(()=>{
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texts.twitter[paid])}`,'_blank');
+      }, 800);
+      showToast('📸 Imagem baixada! Anexe-a ao seu tweet para mais impacto!');
+    } else {
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texts.twitter[paid])}`,'_blank');
+    }
+    return;
+  }
+  if(platform==='facebook'){
+    if(canvas && paid==='paid'){
+      const link=document.createElement('a');
+      link.download='meu-qi-neuromind.png';
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+      setTimeout(()=>{
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}&quote=${encodeURIComponent(texts.facebook[paid])}`,'_blank');
+      }, 800);
+      showToast('📸 Imagem baixada! Publique-a junto no Facebook!');
+    } else {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}&quote=${encodeURIComponent(texts.facebook[paid])}`,'_blank');
+    }
+    return;
+  }
 }
 function confetti(){const colors=['#1a6b5a','#1e6fbf','#d69e2e','#9f7aea','#38a169'];for(let i=0;i<60;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-p';p.style.cssText=`left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;animation-duration:${2+Math.random()*3}s;border-radius:${Math.random()>.5?'50%':'2px'};`;document.body.appendChild(p);setTimeout(()=>p.remove(),5000);},i*25);}}
 
@@ -1155,6 +1216,27 @@ function sendResultEmail(email, profileName, userName) {
     });
 }
 
+
+// ── Toast notification ──
+function showToast(msg){
+  const existing = document.getElementById('share-toast');
+  if(existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.id = 'share-toast';
+  toast.textContent = msg;
+  toast.style.cssText = `
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#1a202c;color:#fff;padding:14px 22px;border-radius:100px;
+    font-family:'Inter',sans-serif;font-size:14px;font-weight:500;
+    box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:9999;
+    animation:toastIn .3s ease;max-width:90vw;text-align:center;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(()=>{
+    toast.style.animation='toastOut .3s ease forwards';
+    setTimeout(()=>toast.remove(), 300);
+  }, 3500);
+}
 window.addEventListener('DOMContentLoaded',()=>{animateLive();checkPaymentReturn();});
 </script>
 </body>
