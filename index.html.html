@@ -328,9 +328,6 @@ footer a{color:#718096;text-decoration:none;}
 @keyframes toastOut{to{opacity:0;transform:translateX(-50%) translateY(20px);}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>
-  emailjs.init("pdf552kvp8kAmGuSk");
-</script>
 <!-- Open Graph / Social Sharing -->
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://neuromindiq.com.br/"/>
@@ -768,15 +765,13 @@ footer a{color:#718096;text-decoration:none;}
     <div class="share-complete">
       <div class="share-complete-title">Compartilhe seu resultado! 🎉</div>
       <div class="share-complete-sub">Mostre ao mundo seu QI e desafie seus amigos</div>
-      <div style="background:#fffbeb;border:1px solid #f6d860;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#744210;max-width:460px;margin-left:auto;margin-right:auto;">
-        💡 <strong>Dica:</strong> Ao clicar nos botões abaixo, a imagem é baixada automaticamente. Anexe ela ao seu post para muito mais impacto!
-      </div>
+
       <canvas id="share-preview" width="600" height="315" class="share-canvas-preview"></canvas>
       <div class="share-btns2">
-        <button class="share-btn2" onclick="shareResult('whatsapp','paid')" style="background:#25d366;color:#fff;">💬 WhatsApp + 📸</button>
-        <button class="share-btn2" onclick="shareResult('twitter','paid')" style="background:#1d9bf0;color:#fff;">🐦 Twitter/X + 📸</button>
+        <button class="share-btn2" onclick="shareResult('whatsapp','paid')" style="background:#25d366;color:#fff;">💬 WhatsApp</button>
+        <button class="share-btn2" onclick="shareResult('twitter','paid')" style="background:#1d9bf0;color:#fff;">🐦 Twitter/X</button>
         <button class="share-btn2" onclick="shareResult('instagram','paid')" style="background:linear-gradient(135deg,#f09433,#dc2743,#bc1888);color:#fff;">📸 Instagram</button>
-        <button class="share-btn2" onclick="shareResult('facebook','paid')" style="background:#1877f2;color:#fff;">👍 Facebook + 📸</button>
+        <button class="share-btn2" onclick="shareResult('facebook','paid')" style="background:#1877f2;color:#fff;">👍 Facebook</button>
         <button class="share-btn2" onclick="shareResult('tiktok','paid')" style="background:#010101;color:#fff;">🎵 TikTok</button>
         <button class="share-btn2" onclick="shareResult('download','paid')" style="background:var(--accent);color:#fff;">⬇️ Baixar Imagem</button>
       </div>
@@ -1039,6 +1034,11 @@ function checkPaymentReturn(){
 }
 function showSuccessScreen(){
   showScreen('success-screen');
+  // Send email also from success screen as backup
+  if(S.email && S.profile){
+    console.log('📧 Backup email send from success screen');
+    sendResultEmail(S.email, S.profile.name, S.name);
+  }
   const prof=S.profile||getProfile(S.iq||115);
   // Personalized greeting
   const firstName = S.name ? S.name.split(' ')[0] : '';
@@ -1091,7 +1091,13 @@ function showSuccessScreen(){
   const ab=[{name:'Raciocínio Lógico',score:Math.round(58+ratio*38),color:'linear-gradient(90deg,#1e6fbf,#1a6b5a)'},{name:'Velocidade Mental',score:Math.round(52+ratio*40),color:'linear-gradient(90deg,#2b6cb0,#2c7a7b)'},{name:'Memória de Trabalho',score:Math.round(50+ratio*38),color:'linear-gradient(90deg,#9f7aea,#667eea)'},{name:'Raciocínio Abstrato',score:Math.round(55+ratio*36),color:'linear-gradient(90deg,#d69e2e,#b7791f)'},{name:'Análise de Padrões',score:Math.round(53+ratio*40),color:'linear-gradient(90deg,#38a169,#2f855a)'},{name:'Inteligência Verbal',score:Math.round(50+ratio*42),color:'linear-gradient(90deg,#805ad5,#6b46c1)'},{name:'Inteligência Numérica',score:Math.round(54+ratio*38),color:'linear-gradient(90deg,#dd6b20,#c05621)'},{name:'Criatividade Cognitiva',score:Math.round(48+ratio*46),color:'linear-gradient(90deg,#d53f8c,#b83280)'}];
   document.getElementById('full-bars').innerHTML=ab.map(b=>`<div class="bar-row2" style="margin-bottom:11px;"><div class="bar-meta2"><span class="bar-name2" style="font-size:13px;">${b.name}</span><span class="bar-score2">${b.score}/100</span></div><div class="bar-track2"><div class="bar-fill2" style="background:${b.color}" data-w="${b.score}"></div></div></div>`).join('');
   setTimeout(()=>document.querySelectorAll('#full-bars .bar-fill2').forEach(b=>b.style.width=b.dataset.w+'%'),300);
-  confetti();setTimeout(()=>generateShareImage('paid'),700);
+  confetti();
+  setTimeout(()=>{
+    generateShareImage('paid');
+    // Inject dynamic OG meta tags so sharing works
+    const ogUrl = buildOGImageUrl();
+    injectOGTags(ogUrl, S.iq||115, (S.profile||getProfile(S.iq||115)).name);
+  }, 700);
 }
 function generateShareImage(paid){
   const canvas=document.getElementById(paid==='paid'?'share-preview':'share-canvas');
@@ -1131,6 +1137,8 @@ function generateShareImage(paid){
 }
 function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
 function shareResult(platform,paid){
+  // Build dynamic OG image URL from API
+  const ogImageUrl = paid==='paid' ? buildOGImageUrl() : null;
   const prof=S.profile||getProfile(S.iq||115);const iq=S.iq||115;
   const texts={
     whatsapp:{free:`🧠 *Acabei de descobrir meu perfil cognitivo!*\n\nMeu perfil: *${prof.name} ${prof.emoji}*\n${prof.title}\n\nDescubra o seu também 👇\n${SITE_URL}`,paid:`🧠 *Meu resultado no NeuroMind IQ!*\n\n*QI: ${iq}* ${prof.emoji}\nPerfil: *${prof.name}*\n${prof.sub}\n\nFaça o seu também 👇\n${SITE_URL}`},
@@ -1143,49 +1151,15 @@ function shareResult(platform,paid){
   if(platform==='instagram'){if(canvas){const l=document.createElement('a');l.download='neuromind-iq-stories.png';l.href=canvas.toDataURL('image/png');l.click();}setTimeout(()=>alert('📸 Imagem baixada!\n\nAbra o Instagram, crie um Story e selecione a imagem baixada.'),500);return;}
   if(platform==='tiktok'){const txt=texts.tiktok[paid];navigator.clipboard.writeText(txt).then(()=>alert('✅ Texto copiado!\n\n'+txt)).catch(()=>prompt('Copie:',txt));return;}
   if(platform==='whatsapp'){
-    if(canvas && paid==='paid'){
-      const link=document.createElement('a');
-      link.download='meu-qi-neuromind.png';
-      link.href=canvas.toDataURL('image/png');
-      link.click();
-      setTimeout(()=>{
-        window.open(`https://wa.me/?text=${encodeURIComponent(texts.whatsapp[paid])}`,'_blank');
-      }, 800);
-      showToast('📸 Imagem baixada! Envie junto com a mensagem no WhatsApp!');
-    } else {
-      window.open(`https://wa.me/?text=${encodeURIComponent(texts.whatsapp[paid])}`,'_blank');
-    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(texts.whatsapp[paid])}`,'_blank');
     return;
   }
   if(platform==='twitter'){
-    // Download image first for user to attach, then open Twitter
-    if(canvas && paid==='paid'){
-      const link=document.createElement('a');
-      link.download='meu-qi-neuromind.png';
-      link.href=canvas.toDataURL('image/png');
-      link.click();
-      setTimeout(()=>{
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texts.twitter[paid])}`,'_blank');
-      }, 800);
-      showToast('📸 Imagem baixada! Anexe-a ao seu tweet para mais impacto!');
-    } else {
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texts.twitter[paid])}`,'_blank');
-    }
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(texts.twitter[paid])}`,'_blank');
     return;
   }
   if(platform==='facebook'){
-    if(canvas && paid==='paid'){
-      const link=document.createElement('a');
-      link.download='meu-qi-neuromind.png';
-      link.href=canvas.toDataURL('image/png');
-      link.click();
-      setTimeout(()=>{
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}&quote=${encodeURIComponent(texts.facebook[paid])}`,'_blank');
-      }, 800);
-      showToast('📸 Imagem baixada! Publique-a junto no Facebook!');
-    } else {
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}&quote=${encodeURIComponent(texts.facebook[paid])}`,'_blank');
-    }
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}&quote=${encodeURIComponent(texts.facebook[paid])}`,'_blank');
     return;
   }
 }
@@ -1194,6 +1168,10 @@ function confetti(){const colors=['#1a6b5a','#1e6fbf','#d69e2e','#9f7aea','#38a1
 // ── EMAILJS — Envio automático de resultado ──
 function sendResultEmail(email, profileName, userName) {
   if (!email || !email.includes('@')) return;
+  // Init again just in case
+  if(typeof emailjs !== 'undefined' && emailjs.init){
+    try{ emailjs.init("pdf552kvp8kAmGuSk"); }catch(e){}
+  }
   const resultUrl = 'https://neuromindiq.com.br/?action=checkout';
   // Envia todas as variáveis possíveis para compatibilidade com o template
   const params = {
@@ -1207,12 +1185,22 @@ function sendResultEmail(email, profileName, userName) {
     from_name: 'NeuroMind IQ',
     reply_to: email,
   };
-  console.log('Enviando email para:', email, 'params:', params);
+  console.log('📧 Tentando enviar email para:', email);
+  console.log('📧 Params:', JSON.stringify(params));
+  console.log('📧 EmailJS disponível:', typeof emailjs);
+  
   emailjs.send('servico_fa9q4zj', 'template_ulo9d9d', params)
     .then(function(response) {
-      console.log('Email enviado! Status:', response.status, response.text);
+      console.log('✅ Email enviado! Status:', response.status, response.text);
     }, function(error) {
-      console.error('Erro EmailJS:', JSON.stringify(error));
+      console.error('❌ Erro EmailJS:', JSON.stringify(error));
+      // Try once more after 2 seconds
+      setTimeout(function(){
+        console.log('🔄 Tentando reenviar...');
+        emailjs.send('servico_fa9q4zj', 'template_ulo9d9d', params)
+          .then(r => console.log('✅ Reenvio OK:', r.status))
+          .catch(e => console.error('❌ Reenvio falhou:', JSON.stringify(e)));
+      }, 2000);
     });
 }
 
@@ -1237,7 +1225,59 @@ function showToast(msg){
     setTimeout(()=>toast.remove(), 300);
   }, 3500);
 }
-window.addEventListener('DOMContentLoaded',()=>{animateLive();checkPaymentReturn();});
+
+// ── Dynamic OG Image + Meta Tags ──
+function buildOGImageUrl(){
+  const prof = S.profile || getProfile(S.iq || 115);
+  const ratio = (S.score||80) / QS.reduce((s,q)=>s+q.pts,0);
+  const params = new URLSearchParams({
+    qi:    S.iq || 115,
+    perfil: prof.name,
+    titulo: prof.title,
+    sub:   prof.sub,
+    emoji: prof.emoji,
+    pct:   S.pct || 75,
+    nome:  S.name || '',
+    l: Math.round(58+ratio*38),
+    m: Math.round(50+ratio*38),
+    v: Math.round(52+ratio*40),
+    p: Math.round(53+ratio*40),
+  });
+  return `https://neuromindiq.com.br/api/og?${params.toString()}`;
+}
+
+function injectOGTags(imageUrl, qi, profileName){
+  const title = `Meu QI é ${qi}! Perfil: ${profileName} — NeuroMind IQ`;
+  const desc  = `Descobri meu potencial cognitivo no NeuroMind IQ. Você consegue bater meu resultado?`;
+  const setMeta = (prop, content, isName) => {
+    const attr = isName ? 'name' : 'property';
+    let el = document.querySelector(`meta[${attr}="${prop}"]`);
+    if(!el){ el = document.createElement('meta'); el.setAttribute(attr, prop); document.head.appendChild(el); }
+    el.setAttribute('content', content);
+  };
+  setMeta('og:title',       title);
+  setMeta('og:description', desc);
+  setMeta('og:image',       imageUrl);
+  setMeta('og:url',         window.location.href);
+  setMeta('twitter:card',   'summary_large_image', true);
+  setMeta('twitter:title',  title, true);
+  setMeta('twitter:description', desc, true);
+  setMeta('twitter:image',  imageUrl, true);
+  // Update page title
+  document.title = title;
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  // Initialize EmailJS
+  if(typeof emailjs !== 'undefined'){
+    emailjs.init("pdf552kvp8kAmGuSk");
+    console.log('EmailJS initialized ✅');
+  } else {
+    console.error('EmailJS not loaded ❌');
+  }
+  animateLive();
+  checkPaymentReturn();
+});
 </script>
 </body>
 </html>
