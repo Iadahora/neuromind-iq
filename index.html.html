@@ -965,13 +965,15 @@ function checkEmail(){
 function goToResult(){
   S.email=document.getElementById('email-input').value||'';
   S.name=document.getElementById('name-input')?document.getElementById('name-input').value.trim():'';
+  // EMAIL 1 será enviado após calcular o perfil (logo abaixo)
   const maxPts=QS.reduce((acc,q)=>acc+q.pts,0);const ratio=S.score/maxPts;
   S.iq=Math.round(82+ratio*63+Math.random()*4);S.iq=Math.min(148,Math.max(82,S.iq));
   S.pct=Math.round(25+ratio*70);S.pct=Math.min(99,Math.max(18,S.pct));
   S.profile=getProfile(S.iq);
   try{localStorage.setItem('nm_iq',S.iq);localStorage.setItem('nm_score',S.score);}catch(e){}
   // Envia email automático com resultado
-  if(S.email) sendResultEmail(S.email, S.profile.name, S.name);
+  // EMAIL 1 — perfil identificado, pede pagamento
+  if(S.email) sendEmail1_Profile(S.email, S.profile.name, S.name);
   showScreen('result-screen');runProcessing();
 }
 function runProcessing(){
@@ -983,7 +985,7 @@ function runProcessing(){
   },700);
 }
 function revealResult(){
-  document.getElementById('proc-wrap').style.display='none';
+  const pw=document.getElementById('proc-wrap');if(pw)pw.style.display='none';
   const rw=document.getElementById('result-wrap');rw.style.display='flex';
   document.getElementById('comp-iq').textContent='???';
   document.getElementById('comp-avatar').textContent=S.gender==='F'?'👩':'👨';
@@ -1026,7 +1028,7 @@ function checkPaymentReturn(){
     S.profile=getProfile(S.iq);
     showScreen('result-screen');
     // Show result first, then auto-open checkout after brief delay
-    document.getElementById('proc-wrap').style.display='none';
+    const pw=document.getElementById('proc-wrap');if(pw)pw.style.display='none';
     const rw=document.getElementById('result-wrap');rw.style.display='flex';
     revealResult();
     setTimeout(()=>goCheckout(), 1500);
@@ -1034,12 +1036,16 @@ function checkPaymentReturn(){
 }
 function showSuccessScreen(){
   showScreen('success-screen');
-  // Send email also from success screen as backup
-  if(S.email && S.profile){
-    console.log('📧 Backup email send from success screen');
-    sendResultEmail(S.email, S.profile.name, S.name);
+  // EMAIL 2 — relatório completo após pagamento
+  const prof2=S.profile||getProfile(S.iq||115);
+  if(S.email){
+    sendEmail2_Report(
+      S.email, S.name,
+      S.iq||115,
+      prof2.name, prof2.title, prof2.sub
+    );
   }
-  const prof=S.profile||getProfile(S.iq||115);
+  const prof=prof2;
   // Personalized greeting
   const firstName = S.name ? S.name.split(' ')[0] : '';
   document.getElementById('s-greeting').textContent = firstName
@@ -1166,41 +1172,48 @@ function shareResult(platform,paid){
 function confetti(){const colors=['#1a6b5a','#1e6fbf','#d69e2e','#9f7aea','#38a169'];for(let i=0;i<60;i++){setTimeout(()=>{const p=document.createElement('div');p.className='confetti-p';p.style.cssText=`left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;animation-duration:${2+Math.random()*3}s;border-radius:${Math.random()>.5?'50%':'2px'};`;document.body.appendChild(p);setTimeout(()=>p.remove(),5000);},i*25);}}
 
 // ── EMAILJS — Envio automático de resultado ──
-function sendResultEmail(email, profileName, userName) {
+// ── EMAIL 1: Enviado ao capturar nome+email (antes do pagamento) ──
+function sendEmail1_Profile(email, profileName, userName) {
   if (!email || !email.includes('@')) return;
-  // Init again just in case
-  if(typeof emailjs !== 'undefined' && emailjs.init){
-    try{ emailjs.init("pdf552kvp8kAmGuSk"); }catch(e){}
-  }
-  const resultUrl = 'https://neuromindiq.com.br/?action=checkout';
-  // Envia todas as variáveis possíveis para compatibilidade com o template
+  try{ emailjs.init("pdf552kvp8kAmGuSk"); }catch(e){}
   const params = {
-    email: email,
-    to_email: email,
-    name: userName || email.split('@')[0],
-    user_name: userName || email.split('@')[0],
-    title: 'Avaliação de QI NeuroMind',
+    email:        email,
+    to_email:     email,
+    name:         userName || email.split('@')[0],
     profile_name: profileName,
-    result_url: resultUrl,
-    from_name: 'NeuroMind IQ',
-    reply_to: email,
+    result_url:   'https://neuromindiq.com.br/?action=checkout',
+    from_name:    'NeuroMind IQ',
   };
-  console.log('📧 Tentando enviar email para:', email);
-  console.log('📧 Params:', JSON.stringify(params));
-  console.log('📧 EmailJS disponível:', typeof emailjs);
-  
-  emailjs.send('servico_fa9q4zj', 'template_ulo9d9d', params)
-    .then(function(response) {
-      console.log('✅ Email enviado! Status:', response.status, response.text);
-    }, function(error) {
-      console.error('❌ Erro EmailJS:', JSON.stringify(error));
-      // Try once more after 2 seconds
-      setTimeout(function(){
-        console.log('🔄 Tentando reenviar...');
-        emailjs.send('servico_fa9q4zj', 'template_ulo9d9d', params)
-          .then(r => console.log('✅ Reenvio OK:', r.status))
-          .catch(e => console.error('❌ Reenvio falhou:', JSON.stringify(e)));
-      }, 2000);
+  console.log('📧 Email 1 (perfil) → ', email);
+  emailjs.send('service_fa9q4zj', 'template_ulo9d9d', params)
+    .then(r => console.log('✅ Email 1 enviado:', r.status))
+    .catch(e => console.error('❌ Email 1 erro:', JSON.stringify(e)));
+}
+
+// ── EMAIL 2: Enviado após pagamento aprovado (relatório completo) ──
+function sendEmail2_Report(email, userName, iq, profileName, profileTitle, profileSub) {
+  if (!email || !email.includes('@')) return;
+  try{ emailjs.init("pdf552kvp8kAmGuSk"); }catch(e){}
+  const params = {
+    email:         email,
+    to_email:      email,
+    name:          userName || email.split('@')[0],
+    iq_score:      iq,
+    profile_name:  profileName,
+    profile_title: profileTitle,
+    profile_sub:   profileSub,
+    result_url:    'https://neuromindiq.com.br/?status=approved',
+    from_name:     'NeuroMind IQ',
+  };
+  console.log('📧 Email 2 (relatório) → ', email, 'QI:', iq);
+  emailjs.send('service_fa9q4zj', 'template_report_complete', params)
+    .then(r => console.log('✅ Email 2 enviado:', r.status))
+    .catch(e => {
+      console.error('❌ Email 2 erro:', JSON.stringify(e));
+      // Fallback: use same template if second doesn't exist yet
+      emailjs.send('service_fa9q4zj', 'template_ulo9d9d', params)
+        .then(r => console.log('✅ Email 2 fallback enviado:', r.status))
+        .catch(e2 => console.error('❌ Email 2 fallback erro:', JSON.stringify(e2)));
     });
 }
 
