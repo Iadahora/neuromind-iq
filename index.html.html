@@ -783,7 +783,7 @@ footer a{color:#718096;text-decoration:none;}
 <script>
 const KIWIFY_URL='https://pay.kiwify.com.br/3fR2rN8';
 const SITE_URL='https://neuromindiq.com.br';
-const S={q:0,score:0,answers:new Array(40).fill(null),iq:0,pct:0,profile:null,timeLeft:900,timerInt:null,urgencyLeft:587,urgencyInt:null,gender:'M',edu:'',email:'',name:'',startTime:0,popupsShown:[],pendingAnswer:null};
+const S={q:0,score:0,answers:new Array(40).fill(null),iq:0,pct:0,profile:null,dimScores:null,timeLeft:900,timerInt:null,urgencyLeft:587,urgencyInt:null,gender:'M',edu:'',email:'',name:'',startTime:0,popupsShown:[],pendingAnswer:null};
 const PROFILES=[
   {min:130,emoji:'🧙‍♂️',name:'Visionário Excepcional',desc:'Capacidade cognitiva extraordinária. Pensamento sistêmico e visão global.',title:'Inteligência Excepcional',sub:'Top 2% da população mundial'},
   {min:120,emoji:'🔬',name:'Analítico Superior',desc:'Raciocínio lógico e precisão excepcionais. Resolve problemas complexos com facilidade.',title:'Inteligência Superior',sub:'Top 10% da população'},
@@ -792,46 +792,46 @@ const PROFILES=[
 ];
 function getProfile(iq){return PROFILES.find(p=>iq>=p.min)||PROFILES[PROFILES.length-1];}
 const QS=[
-  {cat:'Raciocínio Lógico',diff:'easy',text:'Se todos os A são B, e todos os B são C, então:',opts:['Todos os A são C','Alguns A são C','Nenhum A é C','Não é possível determinar','C inclui B e A','Apenas alguns C são A'],c:0,pts:8},
-  {cat:'Lógica Verbal',diff:'easy',text:'Médico está para Hospital assim como Professor está para ___?',opts:['Aluno','Escola','Livro','Ensino','Universidade','Cadeira'],c:1,pts:7},
-  {cat:'Memória Verbal',diff:'easy',text:'Qual palavra NÃO pertence ao grupo: Leão, Tigre, Elefante, Salmão, Leopardo?',opts:['Leão','Tigre','Elefante','Salmão','Leopardo','Chita'],c:3,pts:7},
-  {cat:'Analogia',diff:'easy',text:'Fogo está para Calor assim como Gelo está para ___?',opts:['Neve','Frio','Água','Branco','Inverno','Geada'],c:1,pts:7},
-  {cat:'Lógica Verbal',diff:'easy',text:'Qual das palavras é o antônimo de ABUNDÂNCIA?',opts:['Riqueza','Fartura','Escassez','Excesso','Plenitude','Prosperidade'],c:2,pts:7},
-  {cat:'Sequência Numérica',diff:'medium',text:'Qual é o próximo número? 2 → 6 → 18 → 54 → ___',opts:['108','162','216','72','128','180'],c:1,pts:10},
-  {cat:'Sequência Numérica',diff:'medium',text:'Qual número falta? 1 · 1 · 2 · 3 · 5 · 8 · ___ · 21',opts:['11','12','13','14','10','15'],c:2,pts:10},
-  {cat:'Cálculo Mental',diff:'medium',text:'Quanto é 17 × 13?',opts:['201','221','211','231','191','241'],c:1,pts:10},
-  {cat:'Álgebra',diff:'medium',text:'Se x + y = 10 e x − y = 4, qual o valor de x?',opts:['3','7','6','8','5','4'],c:1,pts:12},
-  {cat:'Cálculo Mental',diff:'hard',text:'Quanto é 23 × 19?',opts:['427','437','417','447','407','457'],c:1,pts:14},
-  {cat:'Padrões Numéricos',diff:'hard',text:'Qual é o padrão? 3 · 9 · 27 · 81 · ___',opts:['162','243','324','189','270','216'],c:1,pts:12},
-  {cat:'Probabilidade',diff:'hard',text:'Numa urna com 3 bolas vermelhas e 2 azuis, qual a chance de tirar vermelha?',opts:['40%','50%','60%','25%','75%','33%'],c:2,pts:14},
-  {cat:'Raciocínio Matemático',diff:'hard',text:'Se 5 máquinas fazem 5 peças em 5 minutos, quantas peças 100 máquinas fazem em 100 minutos?',opts:['100','500','1000','2000','10000','250'],c:2,pts:16},
-  {cat:'Geometria Mental',diff:'medium',text:'Um quadrado tem área de 64cm². Qual é o perímetro?',opts:['24cm','32cm','28cm','36cm','16cm','40cm'],c:1,pts:12},
-  {cat:'Raciocínio Matemático',diff:'hard',text:'O som viaja a 340m/s. Um trovão é ouvido 6s após o relâmpago. Qual a distância da tempestade?',opts:['1.8km','2.0km','2.04km','2.5km','1.5km','3.0km'],c:2,pts:16},
-  {cat:'Padrões Visuais',diff:'easy',text:'Complete a sequência: 🔴 🔵 🟢 🔴 🔵 ___',opts:['🔴','🔵','🟢','🟡','⚪','🟤'],c:2,pts:7},
-  {cat:'Raciocínio Espacial',diff:'medium',isPattern:true,text:'Qual símbolo completa a grade?',pat:['⬛','⬜','⬛','⬜','⬛','⬜','⬛','⬜','❓'],opts:['⬛','⬜','🔲','🔳','◼','◻'],c:0,pts:10},
-  {cat:'Padrões Visuais',diff:'medium',text:'Se ▲+▲+▲=9 e ■+■=8, então ▲+■=?',opts:['6','7','8','9','10','11'],c:1,pts:10},
-  {cat:'Sequência Visual',diff:'hard',isPattern:true,text:'Qual completa o padrão de cores?',pat:['🔴','🟠','🟡','🟢','🔵','🟣','🔴','🟠','❓'],opts:['🟡','🔵','🟢','🟣','🟠','🔴'],c:0,pts:12},
-  {cat:'Padrões Visuais',diff:'medium',text:'Qual figura é diferente: ◯ ◯ ◯ □ ◯',opts:['Primeira ◯','Segunda ◯','Terceira ◯','□ (quadrado)','Quinta ◯','Todas iguais'],c:3,pts:8},
-  {cat:'Raciocínio Visual',diff:'medium',isSVG:true,svgType:'matrix',text:'Complete a matriz. Seguindo o padrão, qual figura preenche o espaço vazio?',opts:['Círculo sólido','Quadrado sólido','Triângulo sólido','Círculo vazio','Quadrado vazio','Triângulo vazio'],c:2,pts:12},
-  {cat:'Raciocínio Visual',diff:'hard',isSVG:true,svgType:'grid',text:'Observando o padrão de grade, qual opção completa corretamente?',opts:['Grade 3×3 fechada','Grade 3×3 aberta','Grade 2×2','Grade diagonal','Grade 4×4','Sem grade'],c:0,pts:14},
-  {cat:'Raciocínio Visual',diff:'medium',isSVG:true,svgType:'mirror',text:'Qual é o reflexo espelhado correto da figura apresentada?',opts:['Reflexo A','Reflexo B (correto)','Reflexo C','Reflexo D','Reflexo E','Reflexo F'],c:1,pts:12},
-  {cat:'Raciocínio Visual',diff:'hard',isSVG:true,svgType:'size',text:'Seguindo o padrão de crescimento, qual figura vem a seguir?',opts:['Raio 20','Raio 26','Raio 32','Raio 38','Raio 44','Raio 50'],c:2,pts:14},
-  {cat:'Raciocínio Lógico',diff:'medium',text:"'Se chove, então molha.' Qual afirmação é logicamente equivalente?",opts:['Se molha, choveu','Se não chove, não molha','Se não molha, não choveu','Chove e molha sempre','Não molha sem chuva','Chuva = molha'],c:2,pts:14},
-  {cat:'Raciocínio Lógico',diff:'hard',text:'Em uma sala com 6 pessoas, cada uma aperta a mão de todas as outras uma vez. Quantos apertos ocorreram?',opts:['12','15','18','20','24','30'],c:1,pts:14},
-  {cat:'Lógica Abstrata',diff:'medium',text:'Se A>B e B>C e C>D, qual afirmação é FALSA?',opts:['A>D','B>D','A>C','D>A','C é menor que B','A é o maior'],c:3,pts:12},
-  {cat:'Raciocínio Lógico',diff:'hard',text:'Todos os artistas são criativos. Alguns criativos são cientistas. Portanto:',opts:['Todos artistas são cientistas','Alguns artistas podem ser cientistas','Nenhum artista é cientista','Todos cientistas são artistas','Criativo=artista','Impossível determinar'],c:1,pts:14},
-  {cat:'Lógica',diff:'hard',text:'Maria é mais velha que João. João é mais velho que Pedro. Ana é mais nova que Pedro. Quem é o mais velho?',opts:['João','Pedro','Maria','Ana','Empate','Impossível saber'],c:2,pts:12},
-  {cat:'Análise Crítica',diff:'medium',text:"Se 'Nenhum X é Y' é verdadeira, qual DEVE ser verdadeira?",opts:['Alguns X são Y','Nenhum Y é X','Todos X são Y','Alguns Y são X','X e Y se relacionam','Impossível determinar'],c:1,pts:12},
-  {cat:'Atenção',diff:'medium',text:"Quantas vezes a letra 'A' aparece em: BANANA ABACAXI MAÇÃ?",opts:['5','6','7','8','4','9'],c:1,pts:10},
-  {cat:'Memória Visual',diff:'easy',text:'Qual sequência está em ordem crescente?',opts:['3,1,4,1,5','1,1,3,4,5','5,4,3,1,1','1,3,1,4,5','4,3,1,1,5','1,1,4,3,5'],c:1,pts:8},
-  {cat:'Memória de Trabalho',diff:'medium',text:'Se você inverter a palavra ESPELHO, qual será a 3ª letra?',opts:['E','L','H','O','S','P'],c:2,pts:12},
-  {cat:'Velocidade',diff:'medium',text:"ROMA ao contrário + primeira letra de 'AZUL' = ?",opts:['AMORA','AMOR-A','AMORA','OMARA','ROAMA','MARAO'],c:0,pts:10},
-  {cat:'Atenção',diff:'hard',text:'Qual número NÃO é primo: 17, 23, 29, 33, 37, 41?',opts:['17','23','29','33','37','41'],c:3,pts:12},
-  {cat:'Raciocínio Rápido',diff:'medium',text:'Um trem viaja a 60km/h. Quanto tempo leva para percorrer 45km?',opts:['30min','45min','60min','75min','90min','20min'],c:1,pts:12},
-  {cat:'Raciocínio Matemático',diff:'hard',text:'Se 40% de um número é 80, qual é 75% desse número?',opts:['120','150','160','175','200','100'],c:1,pts:14},
-  {cat:'Sequência',diff:'hard',text:'Sequência: 2, 4, 12, 48, ___. Qual o próximo?',opts:['96','192','240','288','144','200'],c:2,pts:14},
-  {cat:'Raciocínio Verbal',diff:'medium',text:"'AMORA' embaralhado e invertido forma qual palavra?",opts:['AROMA','ARAMO','MORAR','AROMAS','ROMÃ','RAAMO'],c:0,pts:8},
-  {cat:'Raciocínio Final',diff:'hard',text:'Se hoje é quarta-feira, que dia será daqui a 100 dias?',opts:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],c:3,pts:14},
+  {cat:'Raciocínio Lógico',dim:'logica',diff:'easy',text:'Se todos os A são B, e todos os B são C, então:',opts:['Todos os A são C','Alguns A são C','Nenhum A é C','Não é possível determinar','C inclui B e A','Apenas alguns C são A'],c:0,pts:8},
+  {cat:'Lógica Verbal',dim:'verbal',diff:'easy',text:'Médico está para Hospital assim como Professor está para ___?',opts:['Aluno','Escola','Livro','Ensino','Universidade','Cadeira'],c:1,pts:7},
+  {cat:'Memória Verbal',dim:'memoria',diff:'easy',text:'Qual palavra NÃO pertence ao grupo: Leão, Tigre, Elefante, Salmão, Leopardo?',opts:['Leão','Tigre','Elefante','Salmão','Leopardo','Chita'],c:3,pts:7},
+  {cat:'Analogia',dim:'verbal',diff:'easy',text:'Fogo está para Calor assim como Gelo está para ___?',opts:['Neve','Frio','Água','Branco','Inverno','Geada'],c:1,pts:7},
+  {cat:'Lógica Verbal',dim:'verbal',diff:'easy',text:'Qual das palavras é o antônimo de ABUNDÂNCIA?',opts:['Riqueza','Fartura','Escassez','Excesso','Plenitude','Prosperidade'],c:2,pts:7},
+  {cat:'Sequência Numérica',dim:'numerica',diff:'medium',text:'Qual é o próximo número? 2 → 6 → 18 → 54 → ___',opts:['108','162','216','72','128','180'],c:1,pts:10},
+  {cat:'Sequência Numérica',dim:'numerica',diff:'medium',text:'Qual número falta? 1 · 1 · 2 · 3 · 5 · 8 · ___ · 21',opts:['11','12','13','14','10','15'],c:2,pts:10},
+  {cat:'Cálculo Mental',dim:'numerica',diff:'medium',text:'Quanto é 17 × 13?',opts:['201','221','211','231','191','241'],c:1,pts:10},
+  {cat:'Álgebra',dim:'numerica',diff:'medium',text:'Se x + y = 10 e x − y = 4, qual o valor de x?',opts:['3','7','6','8','5','4'],c:1,pts:12},
+  {cat:'Cálculo Mental',dim:'numerica',diff:'hard',text:'Quanto é 23 × 19?',opts:['427','437','417','447','407','457'],c:1,pts:14},
+  {cat:'Padrões Numéricos',dim:'numerica',diff:'hard',text:'Qual é o padrão? 3 · 9 · 27 · 81 · ___',opts:['162','243','324','189','270','216'],c:1,pts:12},
+  {cat:'Probabilidade',dim:'numerica',diff:'hard',text:'Numa urna com 3 bolas vermelhas e 2 azuis, qual a chance de tirar vermelha?',opts:['40%','50%','60%','25%','75%','33%'],c:2,pts:14},
+  {cat:'Raciocínio Matemático',dim:'numerica',diff:'hard',text:'Se 5 máquinas fazem 5 peças em 5 minutos, quantas peças 100 máquinas fazem em 100 minutos?',opts:['100','500','1000','2000','10000','250'],c:2,pts:16},
+  {cat:'Geometria Mental',dim:'numerica',diff:'medium',text:'Um quadrado tem área de 64cm². Qual é o perímetro?',opts:['24cm','32cm','28cm','36cm','16cm','40cm'],c:1,pts:12},
+  {cat:'Raciocínio Matemático',dim:'numerica',diff:'hard',text:'O som viaja a 340m/s. Um trovão é ouvido 6s após o relâmpago. Qual a distância da tempestade?',opts:['1.8km','2.0km','2.04km','2.5km','1.5km','3.0km'],c:2,pts:16},
+  {cat:'Padrões Visuais',dim:'padroes',diff:'easy',text:'Complete a sequência: 🔴 🔵 🟢 🔴 🔵 ___',opts:['🔴','🔵','🟢','🟡','⚪','🟤'],c:2,pts:7},
+  {cat:'Raciocínio Espacial',dim:'padroes',diff:'medium',isPattern:true,text:'Qual símbolo completa a grade?',pat:['⬛','⬜','⬛','⬜','⬛','⬜','⬛','⬜','❓'],opts:['⬛','⬜','🔲','🔳','◼','◻'],c:0,pts:10},
+  {cat:'Padrões Visuais',dim:'padroes',diff:'medium',text:'Se ▲+▲+▲=9 e ■+■=8, então ▲+■=?',opts:['6','7','8','9','10','11'],c:1,pts:10},
+  {cat:'Sequência Visual',dim:'padroes',diff:'hard',isPattern:true,text:'Qual completa o padrão de cores?',pat:['🔴','🟠','🟡','🟢','🔵','🟣','🔴','🟠','❓'],opts:['🟡','🔵','🟢','🟣','🟠','🔴'],c:0,pts:12},
+  {cat:'Padrões Visuais',dim:'padroes',diff:'medium',text:'Qual figura é diferente: ◯ ◯ ◯ □ ◯',opts:['Primeira ◯','Segunda ◯','Terceira ◯','□ (quadrado)','Quinta ◯','Todas iguais'],c:3,pts:8},
+  {cat:'Raciocínio Visual',dim:'padroes',diff:'medium',isSVG:true,svgType:'matrix',text:'Complete a matriz. Seguindo o padrão, qual figura preenche o espaço vazio?',opts:['Círculo sólido','Quadrado sólido','Triângulo sólido','Círculo vazio','Quadrado vazio','Triângulo vazio'],c:2,pts:12},
+  {cat:'Raciocínio Visual',dim:'padroes',diff:'hard',isSVG:true,svgType:'grid',text:'Observando o padrão de grade, qual opção completa corretamente?',opts:['Grade 3×3 fechada','Grade 3×3 aberta','Grade 2×2','Grade diagonal','Grade 4×4','Sem grade'],c:0,pts:14},
+  {cat:'Raciocínio Visual',dim:'padroes',diff:'medium',isSVG:true,svgType:'mirror',text:'Qual é o reflexo espelhado correto da figura apresentada?',opts:['Reflexo A','Reflexo B (correto)','Reflexo C','Reflexo D','Reflexo E','Reflexo F'],c:1,pts:12},
+  {cat:'Raciocínio Visual',dim:'padroes',diff:'hard',isSVG:true,svgType:'size',text:'Seguindo o padrão de crescimento, qual figura vem a seguir?',opts:['Raio 20','Raio 26','Raio 32','Raio 38','Raio 44','Raio 50'],c:2,pts:14},
+  {cat:'Raciocínio Lógico',dim:'logica',diff:'medium',text:"'Se chove, então molha.' Qual afirmação é logicamente equivalente?",opts:['Se molha, choveu','Se não chove, não molha','Se não molha, não choveu','Chove e molha sempre','Não molha sem chuva','Chuva = molha'],c:2,pts:14},
+  {cat:'Raciocínio Lógico',dim:'logica',diff:'hard',text:'Em uma sala com 6 pessoas, cada uma aperta a mão de todas as outras uma vez. Quantos apertos ocorreram?',opts:['12','15','18','20','24','30'],c:1,pts:14},
+  {cat:'Lógica Abstrata',dim:'logica',diff:'medium',text:'Se A>B e B>C e C>D, qual afirmação é FALSA?',opts:['A>D','B>D','A>C','D>A','C é menor que B','A é o maior'],c:3,pts:12},
+  {cat:'Raciocínio Lógico',dim:'logica',diff:'hard',text:'Todos os artistas são criativos. Alguns criativos são cientistas. Portanto:',opts:['Todos artistas são cientistas','Alguns artistas podem ser cientistas','Nenhum artista é cientista','Todos cientistas são artistas','Criativo=artista','Impossível determinar'],c:1,pts:14},
+  {cat:'Lógica',dim:'logica',diff:'hard',text:'Maria é mais velha que João. João é mais velho que Pedro. Ana é mais nova que Pedro. Quem é o mais velho?',opts:['João','Pedro','Maria','Ana','Empate','Impossível saber'],c:2,pts:12},
+  {cat:'Análise Crítica',dim:'logica',diff:'medium',text:"Se 'Nenhum X é Y' é verdadeira, qual DEVE ser verdadeira?",opts:['Alguns X são Y','Nenhum Y é X','Todos X são Y','Alguns Y são X','X e Y se relacionam','Impossível determinar'],c:1,pts:12},
+  {cat:'Atenção',dim:'velocidade',diff:'medium',text:"Quantas vezes a letra 'A' aparece em: BANANA ABACAXI MAÇÃ?",opts:['5','6','7','8','4','9'],c:1,pts:10},
+  {cat:'Memória Visual',dim:'memoria',diff:'easy',text:'Qual sequência está em ordem crescente?',opts:['3,1,4,1,5','1,1,3,4,5','5,4,3,1,1','1,3,1,4,5','4,3,1,1,5','1,1,4,3,5'],c:1,pts:8},
+  {cat:'Memória de Trabalho',dim:'memoria',diff:'medium',text:'Se você inverter a palavra ESPELHO, qual será a 3ª letra?',opts:['E','L','H','O','S','P'],c:2,pts:12},
+  {cat:'Velocidade',dim:'velocidade',diff:'medium',text:"ROMA ao contrário + primeira letra de 'AZUL' = ?",opts:['AMORA','AMOR-A','AMORA','OMARA','ROAMA','MARAO'],c:0,pts:10},
+  {cat:'Atenção',dim:'velocidade',diff:'hard',text:'Qual número NÃO é primo: 17, 23, 29, 33, 37, 41?',opts:['17','23','29','33','37','41'],c:3,pts:12},
+  {cat:'Raciocínio Rápido',dim:'velocidade',diff:'medium',text:'Um trem viaja a 60km/h. Quanto tempo leva para percorrer 45km?',opts:['30min','45min','60min','75min','90min','20min'],c:1,pts:12},
+  {cat:'Raciocínio Matemático',dim:'numerica',diff:'hard',text:'Se 40% de um número é 80, qual é 75% desse número?',opts:['120','150','160','175','200','100'],c:1,pts:14},
+  {cat:'Sequência',dim:'numerica',diff:'hard',text:'Sequência: 2, 4, 12, 48, ___. Qual o próximo?',opts:['96','192','240','288','144','200'],c:2,pts:14},
+  {cat:'Raciocínio Verbal',dim:'verbal',diff:'medium',text:"'AMORA' embaralhado e invertido forma qual palavra?",opts:['AROMA','ARAMO','MORAR','AROMAS','ROMÃ','RAAMO'],c:0,pts:8},
+  {cat:'Raciocínio Final',dim:'logica',diff:'hard',text:'Se hoje é quarta-feira, que dia será daqui a 100 dias?',opts:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],c:3,pts:14},
 ];
 const POPUPS=[
   {at:8,img:'⚡',title:'Você está indo mais rápido do que <span style="color:var(--blue)">94%</span> de todos os participantes!',desc:'Reações rápidas ajudam as pessoas a se adaptarem e tomarem decisões sob pressão.'},
@@ -970,6 +970,7 @@ function goToResult(){
   S.iq=Math.round(82+ratio*63+Math.random()*4);S.iq=Math.min(148,Math.max(82,S.iq));
   S.pct=Math.round(25+ratio*70);S.pct=Math.min(99,Math.max(18,S.pct));
   S.profile=getProfile(S.iq);
+  S.dimScores=calcDimScores(); // Calculate per-dimension scores
   try{localStorage.setItem('nm_iq',S.iq);localStorage.setItem('nm_score',S.score);}catch(e){}
   // Envia email automático com resultado
   // EMAIL 1 — perfil identificado, pede pagamento
@@ -1003,8 +1004,12 @@ function revealResult(){
   document.getElementById('perc-text').innerHTML=pt;
   document.getElementById('perc-label').textContent='Desbloqueie para ver o percentil exato';
   setTimeout(()=>{document.getElementById('perc-fill').style.width=p+'%';},300);
-  const ratio=S.score/QS.reduce((s,q)=>s+q.pts,0);
-  const pb=[{name:'Raciocínio Lógico',score:Math.round(58+ratio*38),color:'linear-gradient(90deg,#1e6fbf,#1a6b5a)'},{name:'Velocidade Mental',score:Math.round(52+ratio*40),color:'linear-gradient(90deg,#2b6cb0,#2c7a7b)'},{name:'Memória de Trabalho',score:Math.round(50+ratio*38),color:'linear-gradient(90deg,#9f7aea,#667eea)'}];
+  const ds=S.dimScores||calcDimScores();
+  const pb=[
+    {name:'Raciocínio Lógico',   score:ds.logica,    color:'linear-gradient(90deg,#1e6fbf,#1a6b5a)'},
+    {name:'Velocidade Mental',   score:ds.velocidade, color:'linear-gradient(90deg,#2b6cb0,#2c7a7b)'},
+    {name:'Memória de Trabalho', score:ds.memoria,    color:'linear-gradient(90deg,#9f7aea,#667eea)'},
+  ];
   document.getElementById('preview-bars').innerHTML=pb.map(b=>`<div class="bar-row2"><div class="bar-meta2"><span class="bar-name2">${b.name}</span><span class="bar-score2" style="filter:blur(5px);user-select:none;">██</span></div><div class="bar-track2"><div class="bar-fill2" style="background:${b.color}" data-w="${b.score}"></div></div></div>`).join('');
   setTimeout(()=>document.querySelectorAll('.bar-fill2').forEach(b=>b.style.width=b.dataset.w+'%'),400);
 }
@@ -1018,7 +1023,8 @@ function checkPaymentReturn(){
     try{const si=localStorage.getItem('nm_iq');const ss=localStorage.getItem('nm_score');
     if(si){S.iq=parseInt(si);S.score=parseInt(ss)||80;}else{S.iq=115;S.score=80;}}
     catch(e){S.iq=115;S.score=80;}
-    S.profile=getProfile(S.iq);showSuccessScreen();return;
+    S.profile=getProfile(S.iq);
+  S.dimScores=calcDimScores(); // Calculate per-dimension scoresshowSuccessScreen();return;
   }
   // Retorno do link do email — vai para checkout, não para resultado
   if(p.get('action')==='checkout'){
@@ -1026,6 +1032,7 @@ function checkPaymentReturn(){
     if(si){S.iq=parseInt(si);S.score=parseInt(ss)||80;}else{S.iq=115;S.score=80;}}
     catch(e){S.iq=115;S.score=80;}
     S.profile=getProfile(S.iq);
+  S.dimScores=calcDimScores(); // Calculate per-dimension scores
     showScreen('result-screen');
     // Show result first, then auto-open checkout after brief delay
     const pw=document.getElementById('proc-wrap');if(pw)pw.style.display='none';
@@ -1093,8 +1100,17 @@ function showSuccessScreen(){
   document.getElementById('s-emoji').textContent=prof.emoji;
   document.getElementById('s-profile-name').textContent=prof.name;
   document.getElementById('s-profile-desc').textContent=prof.desc;
-  const ratio=(S.score||80)/QS.reduce((s,q)=>s+q.pts,0);
-  const ab=[{name:'Raciocínio Lógico',score:Math.round(58+ratio*38),color:'linear-gradient(90deg,#1e6fbf,#1a6b5a)'},{name:'Velocidade Mental',score:Math.round(52+ratio*40),color:'linear-gradient(90deg,#2b6cb0,#2c7a7b)'},{name:'Memória de Trabalho',score:Math.round(50+ratio*38),color:'linear-gradient(90deg,#9f7aea,#667eea)'},{name:'Raciocínio Abstrato',score:Math.round(55+ratio*36),color:'linear-gradient(90deg,#d69e2e,#b7791f)'},{name:'Análise de Padrões',score:Math.round(53+ratio*40),color:'linear-gradient(90deg,#38a169,#2f855a)'},{name:'Inteligência Verbal',score:Math.round(50+ratio*42),color:'linear-gradient(90deg,#805ad5,#6b46c1)'},{name:'Inteligência Numérica',score:Math.round(54+ratio*38),color:'linear-gradient(90deg,#dd6b20,#c05621)'},{name:'Criatividade Cognitiva',score:Math.round(48+ratio*46),color:'linear-gradient(90deg,#d53f8c,#b83280)'}];
+  const ds2=S.dimScores||calcDimScores();
+  const ab=[
+    {name:'Raciocínio Lógico',    score:ds2.logica,       color:'linear-gradient(90deg,#1e6fbf,#1a6b5a)'},
+    {name:'Velocidade Mental',    score:ds2.velocidade,   color:'linear-gradient(90deg,#2b6cb0,#2c7a7b)'},
+    {name:'Memória de Trabalho',  score:ds2.memoria,      color:'linear-gradient(90deg,#9f7aea,#667eea)'},
+    {name:'Raciocínio Abstrato',  score:ds2.abstrato,     color:'linear-gradient(90deg,#d69e2e,#b7791f)'},
+    {name:'Análise de Padrões',   score:ds2.padroes,      color:'linear-gradient(90deg,#38a169,#2f855a)'},
+    {name:'Inteligência Verbal',  score:ds2.verbal,       color:'linear-gradient(90deg,#805ad5,#6b46c1)'},
+    {name:'Inteligência Numérica',score:ds2.numerica,     color:'linear-gradient(90deg,#dd6b20,#c05621)'},
+    {name:'Criatividade Cognitiva',score:ds2.criatividade,color:'linear-gradient(90deg,#d53f8c,#b83280)'},
+  ];
   document.getElementById('full-bars').innerHTML=ab.map(b=>`<div class="bar-row2" style="margin-bottom:11px;"><div class="bar-meta2"><span class="bar-name2" style="font-size:13px;">${b.name}</span><span class="bar-score2">${b.score}/100</span></div><div class="bar-track2"><div class="bar-fill2" style="background:${b.color}" data-w="${b.score}"></div></div></div>`).join('');
   setTimeout(()=>document.querySelectorAll('#full-bars .bar-fill2').forEach(b=>b.style.width=b.dataset.w+'%'),300);
   confetti();
@@ -1132,7 +1148,8 @@ function generateShareImage(paid){
   ctx.fillStyle='#a0aec0';ctx.font='11px sans-serif';ctx.fillText('neuromindiq.com.br',390,266);
   ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(370,38);ctx.lineTo(370,266);ctx.stroke();
   const ratio=(S.score||80)/QS.reduce((s,q)=>s+q.pts,0);
-  [{n:'Lógica',s:Math.round(58+ratio*38),c:'#1e6fbf'},{n:'Memória',s:Math.round(50+ratio*38),c:'#9f7aea'},{n:'Velocidade',s:Math.round(52+ratio*40),c:'#2c7a7b'},{n:'Padrões',s:Math.round(53+ratio*40),c:'#38a169'}].forEach((b,i)=>{
+  const ds3=S.dimScores||calcDimScores();
+  [{n:'Lógica',s:ds3.logica,c:'#1e6fbf'},{n:'Memória',s:ds3.memoria,c:'#9f7aea'},{n:'Velocidade',s:ds3.velocidade,c:'#2c7a7b'},{n:'Padrões',s:ds3.padroes,c:'#38a169'}].forEach((b,i)=>{
     const y=52+(i*54);ctx.fillStyle='#718096';ctx.font='11px sans-serif';ctx.fillText(b.n,382,y);
     ctx.fillStyle='#f0f4f9';rr(ctx,382,y+5,162,7,3);ctx.fill();
     const fw=paid==='paid'?(b.s/100)*162:50+Math.random()*60;
@@ -1194,6 +1211,7 @@ function sendEmail1_Profile(email, profileName, userName) {
 function sendEmail2_Report(email, userName, iq, profileName, profileTitle, profileSub) {
   if (!email || !email.includes('@')) return;
   try{ emailjs.init("pdf552kvp8kAmGuSk"); }catch(e){}
+  const ds4 = S.dimScores || {};
   const params = {
     email:         email,
     to_email:      email,
@@ -1202,6 +1220,14 @@ function sendEmail2_Report(email, userName, iq, profileName, profileTitle, profi
     profile_name:  profileName,
     profile_title: profileTitle,
     profile_sub:   profileSub,
+    score_logica:      ds4.logica      || '--',
+    score_memoria:     ds4.memoria     || '--',
+    score_velocidade:  ds4.velocidade  || '--',
+    score_padroes:     ds4.padroes     || '--',
+    score_verbal:      ds4.verbal      || '--',
+    score_numerica:    ds4.numerica    || '--',
+    score_criatividade:ds4.criatividade|| '--',
+    score_abstrato:    ds4.abstrato    || '--',
     result_url:    'https://neuromindiq.com.br/?status=approved',
     from_name:     'NeuroMind IQ',
   };
@@ -1278,6 +1304,42 @@ function injectOGTags(imageUrl, qi, profileName){
   setMeta('twitter:image',  imageUrl, true);
   // Update page title
   document.title = title;
+}
+
+
+// ── Per-dimension score calculation ──
+function calcDimScores(){
+  const dims = {
+    logica:      {pts:0, max:0},
+    memoria:     {pts:0, max:0},
+    velocidade:  {pts:0, max:0},
+    padroes:     {pts:0, max:0},
+    verbal:      {pts:0, max:0},
+    numerica:    {pts:0, max:0},
+  };
+  QS.forEach((q, i) => {
+    const dim = q.dim || 'logica';
+    if(!dims[dim]) dims[dim] = {pts:0, max:0};
+    if(dims[dim] !== undefined){
+      dims[dim].max += q.pts;
+      if(S.answers[i] === q.c) dims[dim].pts += q.pts;
+    }
+  });
+  // Convert to 0-100 scores
+  const result = {};
+  Object.keys(dims).forEach(d => {
+    const r = dims[d].max > 0 ? dims[d].pts / dims[d].max : 0;
+    // Scale: min 35, max 98 — makes results feel realistic
+    result[d] = Math.round(35 + r * 63 + (Math.random() * 4 - 2));
+    result[d] = Math.min(98, Math.max(35, result[d]));
+  });
+  // Criatividade — derived from padroes + verbal average with some randomness
+  result.criatividade = Math.round((result.padroes * 0.5 + result.verbal * 0.5) + (Math.random()*10 - 5));
+  result.criatividade = Math.min(98, Math.max(35, result.criatividade));
+  // Abstrato — derived from logica + padroes
+  result.abstrato = Math.round((result.logica * 0.6 + result.padroes * 0.4) + (Math.random()*8 - 4));
+  result.abstrato = Math.min(98, Math.max(35, result.abstrato));
+  return result;
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
