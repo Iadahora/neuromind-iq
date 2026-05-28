@@ -340,6 +340,15 @@ footer a{color:#718096;text-decoration:none;}
 <meta name="twitter:title" content="NeuroMind IQ — Descubra Sua Pontuação de QI"/>
 <meta name="twitter:description" content="Mais de 1.2 milhão de pessoas já descobriram seu potencial cognitivo. Faça o teste grátis!"/>
 <meta name="twitter:image" content="https://neuromindiq.com.br/og-image.jpg"/>
+<!-- TikTok Pixel Code Start -->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+  ttq.load('D8C6P3RC77U9J3L266LG');
+  ttq.page();
+}(window, document, 'ttq');
+</script>
+<!-- TikTok Pixel Code End -->
 </head>
 <body>
 <!-- LANDING -->
@@ -986,6 +995,11 @@ function runProcessing(){
   },700);
 }
 function revealResult(){
+  // TikTok Pixel — visualizou resultado
+  if(typeof ttq !== 'undefined'){
+    ttq.track('ViewContent', {content_type:'product',content_id:'resultado-qi'});
+    console.log('✅ TikTok Pixel: ViewContent disparado');
+  }
   const pw=document.getElementById('proc-wrap');if(pw)pw.style.display='none';
   const rw=document.getElementById('result-wrap');rw.style.display='flex';
   document.getElementById('comp-iq').textContent='???';
@@ -1013,7 +1027,18 @@ function revealResult(){
   document.getElementById('preview-bars').innerHTML=pb.map(b=>`<div class="bar-row2"><div class="bar-meta2"><span class="bar-name2">${b.name}</span><span class="bar-score2" style="filter:blur(5px);user-select:none;">██</span></div><div class="bar-track2"><div class="bar-fill2" style="background:${b.color}" data-w="${b.score}"></div></div></div>`).join('');
   setTimeout(()=>document.querySelectorAll('.bar-fill2').forEach(b=>b.style.width=b.dataset.w+'%'),400);
 }
-function goCheckout(){showScreen('checkout-screen');startUrgencyTimer();}
+function goCheckout(){
+  showScreen('checkout-screen');
+  startUrgencyTimer();
+  // TikTok Pixel — iniciou checkout
+  if(typeof ttq !== 'undefined'){
+    ttq.track('InitiateCheckout', {
+      value: 9.99,
+      currency: 'BRL',
+    });
+    console.log('✅ TikTok Pixel: InitiateCheckout disparado');
+  }
+}
 function startUrgencyTimer(){clearInterval(S.urgencyInt);S.urgencyLeft=587;S.urgencyInt=setInterval(()=>{S.urgencyLeft--;const m=Math.floor(S.urgencyLeft/60),s=S.urgencyLeft%60;const e=document.getElementById('urgency-timer');if(e)e.textContent=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;if(S.urgencyLeft<=0)clearInterval(S.urgencyInt);},1000);}
 function processPayment(){const btn=document.querySelector('.checkout-cta-btn2');btn.textContent='⌛ Redirecionando...';btn.disabled=true;btn.style.opacity='.7';setTimeout(()=>{if(KIWIFY_URL&&!KIWIFY_URL.includes('SEU_LINK')){window.location.href=KIWIFY_URL;}else showSuccessScreen();},800);}
 function checkPaymentReturn(){
@@ -1035,7 +1060,12 @@ function checkPaymentReturn(){
   S.dimScores=calcDimScores(); // Calculate per-dimension scores
     showScreen('result-screen');
     // Show result first, then auto-open checkout after brief delay
-    const pw=document.getElementById('proc-wrap');if(pw)pw.style.display='none';
+    // TikTok Pixel — visualizou resultado
+  if(typeof ttq !== 'undefined'){
+    ttq.track('ViewContent', {content_type:'product',content_id:'resultado-qi'});
+    console.log('✅ TikTok Pixel: ViewContent disparado');
+  }
+  const pw=document.getElementById('proc-wrap');if(pw)pw.style.display='none';
     const rw=document.getElementById('result-wrap');rw.style.display='flex';
     revealResult();
     setTimeout(()=>goCheckout(), 1500);
@@ -1114,6 +1144,16 @@ function showSuccessScreen(){
   document.getElementById('full-bars').innerHTML=ab.map(b=>`<div class="bar-row2" style="margin-bottom:11px;"><div class="bar-meta2"><span class="bar-name2" style="font-size:13px;">${b.name}</span><span class="bar-score2">${b.score}/100</span></div><div class="bar-track2"><div class="bar-fill2" style="background:${b.color}" data-w="${b.score}"></div></div></div>`).join('');
   setTimeout(()=>document.querySelectorAll('#full-bars .bar-fill2').forEach(b=>b.style.width=b.dataset.w+'%'),300);
   confetti();
+  // TikTok Pixel — evento de compra
+  if(typeof ttq !== 'undefined'){
+    ttq.track('CompletePayment', {
+      value: 9.99,
+      currency: 'BRL',
+      content_type: 'product',
+      content_id: 'relatorio-premium-neuromind',
+    });
+    console.log('✅ TikTok Pixel: CompletePayment disparado');
+  }
   setTimeout(()=>{
     generateShareImage('paid');
     // Inject dynamic OG meta tags so sharing works
