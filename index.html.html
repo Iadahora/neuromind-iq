@@ -1050,7 +1050,25 @@ function checkPaymentReturn(){
     catch(e){S.iq=115;S.score=80;}
     S.profile=getProfile(S.iq);
     S.dimScores=calcDimScores();
-    S.realPayment=true; // Pagamento real — dispara eventos de conversão
+    S.realPayment=true;
+    // ✅ TikTok Pixel — dispara IMEDIATAMENTE ao detectar pagamento aprovado
+    try{
+      if(typeof ttq !== 'undefined'){
+        ttq.track('CompletePayment',{
+          value:9.99, currency:'BRL',
+          content_type:'product',
+          content_id:'relatorio-premium-neuromind',
+          quantity:1,
+        });
+        ttq.track('Purchase',{
+          value:9.99, currency:'BRL',
+          content_type:'product',
+          content_id:'relatorio-premium-neuromind',
+          quantity:1,
+        });
+        console.log('✅ TikTok: CompletePayment + Purchase disparados');
+      }
+    }catch(e){ console.error('TikTok pixel error:',e); }
     showSuccessScreen();return;
   }
   // Retorno do link do email — vai para checkout, não para resultado
@@ -1146,26 +1164,7 @@ function showSuccessScreen(){
   document.getElementById('full-bars').innerHTML=ab.map(b=>`<div class="bar-row2" style="margin-bottom:11px;"><div class="bar-meta2"><span class="bar-name2" style="font-size:13px;">${b.name}</span><span class="bar-score2">${b.score}/100</span></div><div class="bar-track2"><div class="bar-fill2" style="background:${b.color}" data-w="${b.score}"></div></div></div>`).join('');
   setTimeout(()=>document.querySelectorAll('#full-bars .bar-fill2').forEach(b=>b.style.width=b.dataset.w+'%'),300);
   confetti();
-  // TikTok Pixel — evento de compra (só dispara em pagamento real)
-  if(typeof ttq !== 'undefined' && S.realPayment){
-    // CompletePayment — evento padrão TikTok
-    ttq.track('CompletePayment', {
-      value: 9.99,
-      currency: 'BRL',
-      content_type: 'product',
-      content_id: 'relatorio-premium-neuromind',
-      quantity: 1,
-    });
-    // Purchase — alias usado por algumas contas TikTok
-    ttq.track('Purchase', {
-      value: 9.99,
-      currency: 'BRL',
-      content_type: 'product',
-      content_id: 'relatorio-premium-neuromind',
-      quantity: 1,
-    });
-    console.log('✅ TikTok Pixel: CompletePayment + Purchase disparados - pagamento real');
-  }
+  // TikTok Pixel já disparou em checkPaymentReturn — não dispara novamente
   setTimeout(()=>{
     generateShareImage('paid');
     // Inject dynamic OG meta tags so sharing works
